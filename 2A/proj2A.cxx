@@ -120,7 +120,7 @@ GLuint SetupPhase345DataForRendering()
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
   
   glBindBuffer(GL_ARRAY_BUFFER, data_vbo);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
   
   glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -163,13 +163,27 @@ const char *phase345FragmentShader =
   "#version 400\n"
   "in float data;\n"
   "in float shading_amount;\n"
+  "float t, r, g, b;\n"
   "out vec4 frag_color;\n"
   "void main() {\n"
   "  frag_color = vec4(1.0, 0.0, 0.0, 1.0);\n"
 
 #ifdef PHASE4
-  // Update frag_color by color based on data
-  //"  frag_color[];\n"
+  // update frag_color by color based on data
+  "  if (data >= 1.0 && data < 4.5) {\n"
+  "    t = (data - 1.0) / (4.5 - 1.0);\n"
+  "    r = 0.25 + t * (1.0 - 0.25);\n"
+  "    g = 0.25 + t * (1.0 - 0.25);\n"
+  "    b = 1.0;\n"
+  "    frag_color = vec4(r, g, b, 1.0);\n"
+  "  }\n"
+  "  else if (data >= 4.5 && data <= 6) {\n"
+  "    t = (data - 6) / (4.5 - 6);\n"
+  "    r = 1.0;\n"
+  "    g = 0.25 + t * (1.0 - 0.25);\n"
+  "    b = 0.25 + t * (1.0 - 0.25);\n"
+  "    frag_color = vec4(r, g, b, 1.0);\n"
+  "  }\n"
 #endif
 
 #ifdef PHASE5
