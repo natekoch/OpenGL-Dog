@@ -1,3 +1,8 @@
+/* proj2A.cxx
+ * Author: Nate Koch
+ * Date: 2/16/23
+ */
+
 #include <GL/glew.h>    // include GLEW and new version of GL on Windows
 #include <GLFW/glfw3.h> // GLFW helper library
 #include <stdio.h>
@@ -12,7 +17,7 @@
 
 #define PHASE3
 #define PHASE4
-//#define PHASE5
+#define PHASE5
 
 void _print_shader_info_log(GLuint shader_index) {
   int max_len = 2048;
@@ -143,6 +148,8 @@ const char *phase345VertexShader =
   "uniform vec3 cameraloc;  // Camera position \n"
   "uniform vec3 lightdir;   // Lighting direction \n"
   "uniform vec4 lightcoeff; // Lighting coeff, Ka, Kd, Ks, alpha\n"
+  "vec3 reflection, viewDir;\n"
+  "float LdotN, diffuse, RdotV, specular;\n"
   "out float data;\n"
   "out float shading_amount;\n"
   "void main() {\n"
@@ -155,6 +162,13 @@ const char *phase345VertexShader =
   // camaraloc  : is the location of the camera
   // lightdir   : is the direction of the light
   // lightcoeff : represents a vec4(Ka, Kd, Ks, alpha) from LightingParams of 1F
+  "  LdotN = dot(lightdir, vertex_normal);\n"
+  "  diffuse = lightcoeff[1] * max(0.0, LdotN);\n"
+  "  reflection = 2 * LdotN * vertex_normal - lightdir;\n"
+  "  viewDir = cameraloc-vertex_position;\n"
+  "  RdotV = dot(normalize(reflection), normalize(viewDir));\n"
+  "  specular = abs(lightcoeff[2] * pow(max(0.0, RdotV), lightcoeff[3]));\n"
+  "  shading_amount = lightcoeff[0] + diffuse + specular;\n"
 #endif
 
   "}\n";
@@ -188,6 +202,7 @@ const char *phase345FragmentShader =
 
 #ifdef PHASE5
   // Update frag_color by mixing the shading factor
+  "  frag_color *= shading_amount;"
 #endif
 
   "}\n";
